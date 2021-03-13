@@ -1,3 +1,6 @@
+// This code is based on
+// https://github.com/builtinnya/aws-lambda-edge-basic-auth-terraform/blob/master/src/basic-auth.js
+
 'use strict'
 
 exports.handler = (event, context, callback) => {

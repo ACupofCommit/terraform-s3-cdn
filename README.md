@@ -1,6 +1,10 @@
 # s3-cdn
 It provides a static web server by AWS Cloudfront and S3.
 
+## Projects that inspired it.
+- https://github.com/builtinnya/aws-lambda-edge-basic-auth-terraform
+- https://github.com/cloudposse/terraform-aws-cloudfront-s3-cdn
+
 ## Requirements
 
 No requirements.

@@ -1,3 +1,6 @@
+// This code is based on
+// https://github.com/builtinnya/aws-lambda-edge-basic-auth-terraform/blob/master/src/basic-auth.js
+
 const expect = require('chai').expect
 const sinon = require('sinon')
 const { handler } = require('../src/basic-auth-handler')
