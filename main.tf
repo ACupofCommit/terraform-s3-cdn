@@ -4,9 +4,10 @@ provider "aws" {
 }
 
 terraform {
+  required_version = ">= 0.14.7"
   required_providers {
     aws = {
-      version = "~> 3.30.0"
+      version = ">= 3.30.0, < 4.0"
       source = "hashicorp/aws"
     }
   }
@@ -17,7 +18,7 @@ terraform {
 
 module "static" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> v1.20.0"
+  version = "~> v2.4.0"
 
   bucket  = "${var.name_prefix}-static-${var.name_suffix}"
   acl     = "private"
@@ -41,11 +42,11 @@ data "aws_iam_policy_document" "cf_access" {
   statement {
     sid       = "S3GetObjectForCloudFront"
     actions   = ["s3:GetObject"]
-    resources = ["${module.static.this_s3_bucket_arn}${local.origin_path}/*"]
+    resources = ["${module.static.s3_bucket_arn}${local.origin_path}/*"]
 
     principals {
       type        = "AWS"
-      identifiers = module.cdn.this_cloudfront_origin_access_identity_iam_arns
+      identifiers = module.cdn.cloudfront_origin_access_identity_iam_arns
     }
   }
 
@@ -54,29 +55,29 @@ data "aws_iam_policy_document" "cf_access" {
     sid       = "DenyS3GetObjectForCloudFront"
     effect    = "Deny"
     actions   = ["s3:GetObject"]
-    resources = ["${module.static.this_s3_bucket_arn}/${local.key_for_secret_file}"]
+    resources = ["${module.static.s3_bucket_arn}/${local.key_for_secret_file}"]
 
     principals {
       type        = "AWS"
-      identifiers = module.cdn.this_cloudfront_origin_access_identity_iam_arns
+      identifiers = module.cdn.cloudfront_origin_access_identity_iam_arns
     }
   }
 }
 
 resource "aws_s3_bucket_policy" "origin_access" {
-  bucket = module.static.this_s3_bucket_id
+  bucket = module.static.s3_bucket_id
   policy = data.aws_iam_policy_document.cf_access.json
 }
 
 resource "aws_s3_bucket_object" "index_html" {
-  bucket        = module.static.this_s3_bucket_id
+  bucket        = module.static.s3_bucket_id
   key           = "index.html"
   content       = file("${path.module}/assets/index.html")
   content_type  = "text/html"
 }
 
 resource "aws_s3_bucket_object" "secret_json" {
-  bucket        = module.static.this_s3_bucket_id
+  bucket        = module.static.s3_bucket_id
   key           = "secret.json"
   content       = file("${path.module}/assets/secret.json")
 }
@@ -103,7 +104,7 @@ data "archive_file" "basic_auth_function" {
 
 module "basic_auth_as_lambda_edge" {
   source                    = "terraform-aws-modules/lambda/aws"
-  version                   = "~> v1.44.0"
+  version                   = "~> v2.4.0"
   count                     = length(data.archive_file.basic_auth_function)
   lambda_at_edge            = true
   function_name             = "${var.name_prefix}-edge-proxy-${var.name_suffix}"
@@ -128,7 +129,7 @@ module "basic_auth_as_lambda_edge" {
 
 module "cdn" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "~> 1.8.0"
+  version = "~> 2.5.0"
   aliases = var.domain != null ? [var.domain] : null
 
   comment             = "${var.name_prefix}-cdn-${var.name_suffix}"
@@ -152,7 +153,7 @@ module "cdn" {
   # Static deployment S3 bucket
   origin = {
     static = {
-      domain_name = module.static.this_s3_bucket_bucket_domain_name
+      domain_name = module.static.s3_bucket_bucket_domain_name
       s3_origin_config = {
         origin_access_identity = "s3_bucket_one"
       }
@@ -176,14 +177,14 @@ module "cdn" {
 
     lambda_function_association = length(module.basic_auth_as_lambda_edge) == 1 ? {
       viewer-request = {
-        lambda_arn   = module.basic_auth_as_lambda_edge[0].this_lambda_function_qualified_arn
+        lambda_arn   = module.basic_auth_as_lambda_edge[0].lambda_function_qualified_arn
         include_body = false
       }
     } : {}
   }
 
   viewer_certificate = length(module.acm) == 1 ? {
-    acm_certificate_arn = module.acm[0].this_acm_certificate_arn
+    acm_certificate_arn = module.acm[0].acm_certificate_arn
     ssl_support_method  = "sni-only"
   } : {
     cloudfront_default_certificate = true
@@ -202,7 +203,7 @@ data "aws_route53_zone" "selected" {
 
 module "acm" {
   source                    = "terraform-aws-modules/acm/aws"
-  version                   = "~> v2.14"
+  version                   = "~> v3.0"
   count                     = var.domain != null ? 1 : 0
   domain_name               = var.domain
   zone_id                   = data.aws_route53_zone.selected[0].zone_id
@@ -220,8 +221,8 @@ resource "aws_route53_record" "service" {
   name    = var.domain
   type    = "A"
   alias {
-    name                   = module.cdn.this_cloudfront_distribution_domain_name
-    zone_id                = module.cdn.this_cloudfront_distribution_hosted_zone_id
+    name                   = module.cdn.cloudfront_distribution_domain_name
+    zone_id                = module.cdn.cloudfront_distribution_hosted_zone_id
     evaluate_target_health = false
   }
 }
