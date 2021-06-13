@@ -227,3 +227,49 @@ resource "aws_route53_record" "service" {
   }
 }
 
+##################################3
+# IAM User for CI&CD
+
+resource "aws_iam_user" "ci" {
+  name  = "${var.name_prefix}-ci-${var.name_suffix}"
+  path  = "/"
+  tags = var.tags
+}
+
+resource "aws_iam_access_key" "ci" {
+  user    = aws_iam_user.ci.name
+  pgp_key = file("./pubkey.gpg")
+
+  lifecycle {
+    ignore_changes = [
+      pgp_key,
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "ci" {
+  name        = "${var.name_prefix}-ci-${var.name_suffix}"
+  user        = aws_iam_user.ci.name
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [ "s3:*" ],
+        Resource = [
+          "${module.static.s3_bucket_arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [ "s3:List*", "s3:Get*" ],
+        Resource = module.static.s3_bucket_arn
+      },
+      {
+        Effect = "Allow",
+        Action = [ "cloudfront:GetInvalidation", "cloudfront:CreateInvalidation" ],
+        Resource = module.cdn.cloudfront_distribution_arn
+      },
+    ]
+  })
+}
