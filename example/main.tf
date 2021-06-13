@@ -4,6 +4,23 @@ locals {
   name_suffix = "cw9few"
 }
 
+module "log" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> v2.4.0"
+
+  bucket  = "${local.name_prefix}-logs-${local.name_suffix}"
+  acl     = "log-delivery-write"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  versioning = {
+    enabled = false
+  }
+}
+
 module "cdn" {
   source = "../"
 
@@ -16,4 +33,7 @@ module "cdn" {
     username = "admin"
     password = "change-it"
   }
+
+  log_bucket_domain = module.log.s3_bucket_bucket_domain_name
+  log_prefix = "cdn"
 }
