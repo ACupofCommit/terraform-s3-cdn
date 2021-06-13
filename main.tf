@@ -153,7 +153,7 @@ module "cdn" {
   # Static deployment S3 bucket
   origin = {
     static = {
-      domain_name = module.static.s3_bucket_bucket_domain_name
+      domain_name = module.static.s3_bucket_bucket_regional_domain_name
       s3_origin_config = {
         origin_access_identity = "s3_bucket_one"
       }
