@@ -1,3 +1,7 @@
+provider "aws" {
+  alias = "use1"
+  region = "us-east-1"
+}
 
 locals {
   name_prefix = "test-cdn"
@@ -36,4 +40,8 @@ module "cdn" {
 
   log_bucket_domain = module.log.s3_bucket_bucket_domain_name
   log_prefix = "cdn"
+
+  providers = {
+    aws.global_region = aws.use1
+  }
 }

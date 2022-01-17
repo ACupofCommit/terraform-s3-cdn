@@ -1,18 +1,3 @@
-provider "aws" {
-  alias = "us-east-1"
-  region = "us-east-1"
-}
-
-terraform {
-  required_version = ">= 0.14.7"
-  required_providers {
-    aws = {
-      version = ">= 3.30.0, < 4.0"
-      source = "hashicorp/aws"
-    }
-  }
-}
-
 ##############################
 # S3 for static assets
 
@@ -120,7 +105,7 @@ module "basic_auth_as_lambda_edge" {
   tags                              = var.tags
 
   providers = {
-    aws = aws.us-east-1
+    aws = aws.global_region
   }
 }
 
@@ -211,7 +196,7 @@ module "acm" {
   tags                      = var.tags
 
   providers = {
-    aws = aws.us-east-1
+    aws = aws.global_region
   }
 }
 
