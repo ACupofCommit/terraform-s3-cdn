@@ -60,6 +60,7 @@ It provides a static web server by AWS Cloudfront and S3.
 | <a name="input_name_suffix"></a> [name\_suffix](#input\_name\_suffix) | Suffix of almost resource names. Ex) some random string | `string` | n/a | yes |
 | <a name="input_price_class"></a> [price\_class](#input\_price\_class) | n/a | `string` | `"PriceClass_100"` | no |
 | <a name="input_route53_zone_name"></a> [route53\_zone\_name](#input\_route53\_zone\_name) | n/a | `string` | `null` | no |
+| <a name="input_static_bucket_name"></a> [static\_bucket\_name](#input\_static\_bucket\_name) | S3 Bucket name for static assets. It is mainly used when you want to reuse an existing bucket by importing it. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | n/a | `map(string)` | `{}` | no |
 
 ## Outputs
