@@ -8,6 +8,12 @@ variable "name_suffix" {
   description = "Suffix of almost resource names. Ex) some random string"
 }
 
+variable "static_bucket_name" {
+  type        = string
+  description = "S3 Bucket name for static assets. It is mainly used when you want to reuse an existing bucket by importing it."
+  default     = null
+}
+
 variable "enable_log" {
   type    = bool
   default = false

@@ -5,7 +5,7 @@ module "static" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> v2.4.0"
 
-  bucket  = "${var.name_prefix}-static-${var.name_suffix}"
+  bucket  = var.static_bucket_name != null ? var.static_bucket_name : "${var.name_prefix}-static-${var.name_suffix}"
   acl     = "private"
 
   block_public_acls       = true
