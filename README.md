@@ -1,5 +1,5 @@
 # s3-cdn
-It provides a static web server by AWS Cloudfront and S3.
+It provides a static web server with CDN by AWS Cloudfront and S3.
 
 ## Projects that inspired it.
 - https://github.com/builtinnya/aws-lambda-edge-basic-auth-terraform
@@ -50,6 +50,7 @@ It provides a static web server by AWS Cloudfront and S3.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_basic_auth_credentials"></a> [basic\_auth\_credentials](#input\_basic\_auth\_credentials) | Credentials for Basic Authentication. Pass a map composed of 'user' and 'password'. | `object({ username = string, password = string })` | `null` | no |
+| <a name="input_create_sample_files"></a> [create\_sample\_files](#input\_create\_sample\_files) | Upload sample files(index.html, secret.json) into static bucket | `bool` | `true` | no |
 | <a name="input_domain"></a> [domain](#input\_domain) | n/a | `string` | `null` | no |
 | <a name="input_enable_log"></a> [enable\_log](#input\_enable\_log) | n/a | `bool` | `false` | no |
 | <a name="input_lambda_role_permissions_boundary"></a> [lambda\_role\_permissions\_boundary](#input\_lambda\_role\_permissions\_boundary) | ARN of IAM policy that scopes aws\_iam\_role access for the lambda | `string` | `null` | no |
