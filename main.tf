@@ -55,6 +55,7 @@ resource "aws_s3_bucket_policy" "origin_access" {
 }
 
 resource "aws_s3_bucket_object" "index_html" {
+  count         = var.create_sample_files ? 1 : 0
   bucket        = module.static.s3_bucket_id
   key           = "index.html"
   content       = file("${path.module}/assets/index.html")
@@ -62,6 +63,7 @@ resource "aws_s3_bucket_object" "index_html" {
 }
 
 resource "aws_s3_bucket_object" "secret_json" {
+  count         = var.create_sample_files ? 1 : 0
   bucket        = module.static.s3_bucket_id
   key           = "secret.json"
   content       = file("${path.module}/assets/secret.json")

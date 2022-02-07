@@ -66,3 +66,9 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "create_sample_files" {
+  type        = bool
+  description = "Upload sample files(index.html, secret.json) into static bucket"
+  default     = true
+}
